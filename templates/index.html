@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XGBoost Prediction</title>
+</head>
+<body>
+    <h1>XGBoost Prediction</h1>
+    <form id="prediction-form">
+        <label for="CreditScore">Credit Score:</label>
+        <input type="number" id="CreditScore" name="CreditScore" required><br><br>
+
+        <label for="Geography">Geography:</label>
+        <select id="Geography" name="Geography" required>
+            <option value="France">France</option>
+            <option value="Germany">Germany</option>
+            <option value="Spain">Spain</option>
+        </select><br><br>
+
+        <label for="Gender">Gender:</label>
+        <select id="Gender" name="Gender" required>
+            <option value="Female">Female</option>
+            <option value="Male">Male</option>
+        </select><br><br>
+
+        <label for="Age">Age:</label>
+        <input type="number" id="Age" name="Age" required><br><br>
+
+        <label for="Balance">Balance:</label>
+        <input type="number" id="Balance" name="Balance" required><br><br>
+
+        <label for="NumOfProducts">Number of Products:</label>
+        <input type="number" id="NumOfProducts" name="NumOfProducts" min="1" max="4" required><br><br>
+
+        <label for="IsActiveMember">Is Active Member:</label>
+        <input type="checkbox" id="IsActiveMember" name="IsActiveMember" value="true"><br><br>
+
+        <label for="EstimatedSalary">Estimated Salary:</label>
+        <input type="number" id="EstimatedSalary" name="EstimatedSalary" required><br><br>
+
+        <button type="submit">Predict</button>
+    </form>
+
+    <div id="prediction-result"></div>
+
+    <script>
+        document.getElementById("prediction-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+            
+            // Get form data
+            var formData = new FormData(this);
+
+            // Send POST request to Flask backend
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display prediction result
+                document.getElementById("prediction-result").innerText = "Prediction: " + data.prediction;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
