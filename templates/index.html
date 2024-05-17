@@ -3,43 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XGBoost Prediction</title>
+    <title>Прогнозирование ухода клиента банка</title>
+    <style>
+        body {
+        background-color: #FFFFE0; /* светло-желтый фон */
+        font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 1.2em;
+        }
+
+        input, select, button {
+            font-size: 1.2em;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            font-size: 1.2em;
+            padding: 10px 20px;
+        }
+
+        #prediction-result {
+            margin-top: 20px;
+            font-size: 1.5em;
+        }
+    </style>
 </head>
 <body>
-    <h1>XGBoost Prediction</h1>
+    <h1>Классификация клиента банка</h1>
     <form id="prediction-form">
-        <label for="CreditScore">Credit Score:</label>
+
+        <label for="CreditScore">Кредитный рейтинг (350-850):</label>
         <input type="number" id="CreditScore" name="CreditScore" required><br><br>
 
-        <label for="Geography">Geography:</label>
+        <label for="Geography">Страна проживания:</label>
         <select id="Geography" name="Geography" required>
             <option value="France">France</option>
             <option value="Germany">Germany</option>
             <option value="Spain">Spain</option>
         </select><br><br>
 
-        <label for="Gender">Gender:</label>
+        <label for="Gender">Пол:</label>
         <select id="Gender" name="Gender" required>
             <option value="Female">Female</option>
             <option value="Male">Male</option>
         </select><br><br>
 
-        <label for="Age">Age:</label>
+        <label for="Age">Возраст:</label>
         <input type="number" id="Age" name="Age" required><br><br>
 
-        <label for="Balance">Balance:</label>
+        <label for="Tenure">Срок владения:</label>
+        <input type="number" id="Tenure" name="Tenure" required><br><br>
+
+        <label for="Balance">Баланс счета:</label>
         <input type="number" id="Balance" name="Balance" required><br><br>
 
-        <label for="NumOfProducts">Number of Products:</label>
+        <label for="NumOfProducts">Число продуктов (1-4):</label>
         <input type="number" id="NumOfProducts" name="NumOfProducts" min="1" max="4" required><br><br>
 
-        <label for="IsActiveMember">Is Active Member:</label>
+        <label for="IsActiveMember">Активный клиент:</label>
         <input type="checkbox" id="IsActiveMember" name="IsActiveMember" value="true"><br><br>
 
-        <label for="EstimatedSalary">Estimated Salary:</label>
+        <label for="EstimatedSalary">Ориентировочная зарплата:</label>
         <input type="number" id="EstimatedSalary" name="EstimatedSalary" required><br><br>
 
-        <button type="submit">Predict</button>
+        <button type="submit">Рассчитать прогноз</button>
     </form>
 
     <div id="prediction-result"></div>
@@ -48,18 +83,21 @@
         document.getElementById("prediction-form").addEventListener("submit", function(event) {
             event.preventDefault();
             
-            // Get form data
+            // получить данные из формы
             var formData = new FormData(this);
-
-            // Send POST request to Flask backend
+    
+            // преобразовать флажок в 0 или 1
+            formData.set('IsActiveMember', document.getElementById('IsActiveMember').checked ? 1 : 0);
+    
+            // отправить POST запрос в приложение Flask
             fetch('/predict', {
                 method: 'POST',
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
-                // Display prediction result
-                document.getElementById("prediction-result").innerText = "Prediction: " + data.prediction;
+                // отобразить предсказание и уверенность
+                document.getElementById("prediction-result").innerText = "Прогноз: " + data.prediction + " (Уверенность: " + (data.certainty * 100).toFixed(2) + "%)";
             })
             .catch(error => {
                 console.error('Error:', error);
